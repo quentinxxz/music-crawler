@@ -46,6 +46,11 @@ class MP3Crawler:
     def downloadMP3(self,url,filePath):
         self.mp3Downloader.downloadM(url, filePath)
 
+    def __printResult(self,request,result):
+        print "calllllllllllllllllllllllllllll"
+        print "---Result from request %s : %r" % (request.requestID,result)
+        #pass
+
     def addTask(self,task):
         '''add a mp3 download task
         '''
@@ -56,9 +61,7 @@ class MP3Crawler:
         self.threadPool.putRequest(req)
         print "work request #%s added." % req.requestID
 
-    def __printResult(self,request,result):
-        print "---Result from request %s : %r" % (request.requestID,result)
-        #pass
+
 
 
 class CrawlerThread(threading.Thread):
@@ -78,7 +81,8 @@ class CrawlerThread(threading.Thread):
             try:
                 if(self.pollInterval>0):
                     time.sleep(self.poolInterval) 
-                self.threadPool.poll()
+                print 'start polling '    
+                self.threadPool.poll(True)
             except NoResultsPending:
                 print "no pending results"
                 break

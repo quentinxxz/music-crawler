@@ -63,7 +63,6 @@ class WorkerThread(threading.Thread):
                 try:
                     '''执行callable，讲请求和结果以tuple的方式放入requestQueue'''
                     result = request.callable(*request.args,**request.kwds)
-                    print self.getName()
                     self._resultQueue.put((request,result))
                 except:
                     '''异常处理'''
