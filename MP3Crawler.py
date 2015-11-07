@@ -5,23 +5,27 @@ import urllib
 import re
 import time
 from ThreadPool import *
+from MP3Downloader import *
 
 class MP3Crawler:
     '''
     @param crawlername
     @param workerThreadNum
     @param pollInterval: interval time to poll task from task queue
-    @param pollTimeout: timeout second to poll a task from task queue
+    @param pollTimeout: timeout seconds to poll a task from task queue
+    @param downloadTimeout: timeout seconds to download media from web
     '''
-    def __init__(self,crawlername,workerThreadNum,pollInterval=5,pollTimeout=None):
+    def __init__(self,crawlername,workerThreadNum,
+        pollInterval=5,pollTimeout=None,downloadTimeout=5):
         self.threadPool = ThreadPool(workerThreadNum)
         self.crawlername=crawlername
         self.pollTimeout = pollTimeout 
         self.crawlerThread = CrawlerThread(self.threadPool,pollTimeout)
+        self.mp3Downloader = MP3Downloader(downloadTimeout)
 
     def start(self):
         '''start crawl'''
-        crawlerThread.start()
+        self.crawlerThread.start()
 
     def stop(self):
         '''stop crawl, block until all tasks finish'''
@@ -32,14 +36,15 @@ class MP3Crawler:
     def __checkTask(self,task):
         if task.has_key('type')==False or task.has_key('url') ==False:
            return False
-        if task['type']!='mp3' or task['type']!='html' or task['type']!='json':
+        if task['type']!='mp3' and task['type']!='html' and task['type']!='json':
             return False
         if task.has_key('savePath')==False:
             return False
         else:
             return True
     
-    def downloadMP3(url,filePath):
+    def downloadMP3(self,url,filePath):
+        print 'downloadinggggggggggggg'#TOO
         downloader.downloadM(url, filePath)
 
     def addTask(self,task):
@@ -48,14 +53,13 @@ class MP3Crawler:
         if self.__checkTask(task) == False:
             print 'Task not Avilable:', task  
             return
-        req = WorkRequest(downloadMP3,args=[task['url'],task['savePath']],kwds={},callback=self.__printResult)
-        main.putRequest(req)
+        req = WorkRequest(self.downloadMP3,args=[task['url'],task['savePath']],kwds={},callback=self.__printResult)
+        self.threadPool.putRequest(req)
         print "work request #%s added." % req.requestID
 
     def __printResult(request,result):
-        pass
-        '''print "---Result from request %s : %r" % (request.requestID,result)
-        '''
+        #pass
+        print "---Result from request %s : %r" % (request.requestID,result)
 
 class CrawlerThread(threading.Thread):
     """Crawler Thread"""
@@ -65,7 +69,6 @@ class CrawlerThread(threading.Thread):
         self.threadPool = threadPool
         self.pollInterval = pollInterval
         self._dismissed = threading.Event()
-        self.start()
         
     def run(self):
         while True:
@@ -75,7 +78,7 @@ class CrawlerThread(threading.Thread):
             try:
                 if(self.pollInterval>0):
                     time.sleep(self.poolInterval) 
-                threadPool.poll()
+                self.threadPool.poll()
             except NoResultsPending:
                 print "no pending results"
                 break
@@ -84,6 +87,11 @@ class CrawlerThread(threading.Thread):
         self._dismissed.set()
 
 if __name__=="__main__":
-    task ={'a':1}
     crawler = MP3Crawler("mp3",3)
-    crawler.addTask(task)
+    crawler.start()
+    for i in range(5):
+        task ={'savePath':"tmp/" + str(i)+'.mp3','type':'mp3',
+        'url':"http://m2.music.126.net/yvMiGSJhylUxrU2AGhuTbg==/1158885255685125.mp3"}
+        crawler.addTask(task)
+    time.sleep(20)
+    crawler.stop()
