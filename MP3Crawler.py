@@ -4,105 +4,86 @@ import threading
 import urllib
 import re
 import time
-from GolableValues import *
-
+from ThreadPool import *
 
 class MP3Crawler:
-    def __init__(self,crawlername,threadnum):
+    '''
+    @param crawlername
+    @param workerThreadNum
+    @param pollInterval: interval time to poll task from task queue
+    '''
+    def __init__(self,crawlername,workerThreadNum,pollInterval=None):
+        self.threadPool = ThreadPool(workerThreadNum)
         self.crawlername=crawlername
-        self.url=url
-        self.threadnum=threadnum
-        self.threadpool=[]
-        self.logfile=file("log.txt",'w')
+        self.timeout = 5 # 5 seconds
+        self.crawlerThread = CrawlerThread(self.threadPool,pollInterval)
 
-    def craw(self):
-        global g_queueURL
-        g_queueURL.append(url)    
-        depth=0
-        print self.crawlername+" 启动..."
-        while(len(g_queueURL)!=0):
-            depth+=1
-            print 'Searching depth ',depth,'...\n\n'
-            self.logfile.write("URL:"+g_queueURL[0]+"........")
-            self.downloadAll()
-            self.updateQueueURL()
-            content='\n>>>Depth '+str(depth)+':\n'
-            self.logfile.write(content)
-            i=0
-            while i<len(g_queueURL):
-                content=str(g_totalcount+i)+'->'+g_queueURL[i]+'\n'
-                self.logfile.write(content)
-                i+=1
+    def start(self):
+        '''start crawl'''
+        crawlerThread.start()
 
-    def downloadAll(self):
-        global g_queueURL
-        global g_totalcount
-        i=0
-        while i<len(g_queueURL):
-            j=0
-            while j<self.threadnum and i+j < len(g_queueURL):
-                g_totalcount+=1
-                threadresult=self.download(g_queueURL[i+j],str(g_totalcount)+'.html',j)
-                if threadresult!=None:
-                    print 'Thread started:',i+j,'--File number =',g_totalcount
-                j+=1
-            i+=j
-            for thread in self.threadpool:
-                thread.join(30)
-            threadpool=[]
-        g_queueURL=[]
+    def stop(self):
+        '''stop crawl, block until all tasks finish'''
+        self.threadPool.stop()
+        self.crawlerThread.dismiss()
+        self.crawlerThread.join()
 
-    def download(self,url,filename,tid):
-        crawthread=CrawlerThread(url,filename,tid)
-        self.threadpool.append(crawthread)
-        crawthread.start()
+    def __checkTask(self,task):
+        if task.has_key('type')==False or task.has_key('url') ==False:
+           return False
+        if task['type']!='mp3' or task['type']!='html' or task['type']!='json':
+            return False
+        if task.has_key('savePath')==False:
+            return False
+        else:
+            return True
+    
+    def downloadMP3(url,filePath):
+        downloader.downloadM(url, filePath)
 
-    def updateQueueURL(self):
-        global g_queueURL
-        global g_existURL
-        newUrlList=[]
-        for content in g_pages:
-            newUrlList+=self.getUrl(content)
-        g_queueURL=list(set(newUrlList)-set(g_existURL))    
-    def getUrl(self,content):
-        reg=r'"(http://.+?)"'
-        regob=re.compile(reg,re.DOTALL)
-        urllist=regob.findall(content)
-        return urllist
+    def addTask(self,task):
+        '''add a mp3 download task
+        '''
+        if self.__checkTask(task) == False:
+            print 'Task not Avilable:', task  
+            return
+        req = WorkRequest(downloadMP3,args=[task['url'],task['savePath']],kwds={},callback=self.__printResult)
+        main.putRequest(req)
+        print "work request #%s added." % req.requestID
+
+    def __printResult(request,result):
+        pass
+        '''print "---Result from request %s : %r" % (request.requestID,result)
+        '''
 
 class CrawlerThread(threading.Thread):
-    def __init__(self,url,filename,tid):
+    """Crawler Thread"""
+    def __init__(self,threadPool,pollInterval):
         threading.Thread.__init__(self)
-        self.url=url
-        self.filename=filename
-        self.tid=tid
+        self.setDaemon(True)
+        self.threadPool = threadPool
+        self.pollInterval = pollInterval
+        self._dismissed = threading.Event()
+        self.start()
+        
     def run(self):
-        global g_mutex
-        global g_failedURL
-        global g_queueURL
-        try:
-            page=urllib.urlopen(self.url)
-            html=page.read()
-            fout=file(self.filename,'w')
-            fout.write(html)
-            fout.close()
-        except Exception,e:
-            g_mutex.acquire()
-            g_existURL.append(self.url)
-            g_failedURL.append(self.url)
-            g_mutex.release()
-            print 'Failed downloading and saving',self.url
-            print e
-            return None
-        g_mutex.acquire()
-        g_pages.append(html)
-        g_existURL.append(self.url)
-        g_mutex.release()
+        while True:
+            #TODO: left taskes may not be executed
+            if self._dismissed.is_set():
+                    break
+            try:
+                if(self.pollInterval>0):
+                    time.sleep(self.poolInterval) 
+                threadPool.poll()
+            except NoResultsPending:
+                print "no pending results"
+                break
     
+    def dismiss(self):
+        self._dismissed.set()
+
 
 if __name__=="__main__":
-    url=raw_input("请输入url入口:\n")
-    threadnum=int(raw_input("设置线程数:"))
-    crawlername="小小爬虫"
-    crawler=Crawler(crawlername,url,threadnum)
-    crawler.craw()
+    task ={'a':1}
+    crawler = MP3Crawler("mp3",3)
+    crawler.addTask(task)
