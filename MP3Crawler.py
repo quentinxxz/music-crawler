@@ -11,12 +11,13 @@ class MP3Crawler:
     @param crawlername
     @param workerThreadNum
     @param pollInterval: interval time to poll task from task queue
+    @param pollTimeout: timeout second to poll a task from task queue
     '''
-    def __init__(self,crawlername,workerThreadNum,pollInterval=None):
+    def __init__(self,crawlername,workerThreadNum,pollInterval=5,pollTimeout=None):
         self.threadPool = ThreadPool(workerThreadNum)
         self.crawlername=crawlername
-        self.timeout = 5 # 5 seconds
-        self.crawlerThread = CrawlerThread(self.threadPool,pollInterval)
+        self.pollTimeout = pollTimeout 
+        self.crawlerThread = CrawlerThread(self.threadPool,pollTimeout)
 
     def start(self):
         '''start crawl'''
@@ -81,7 +82,6 @@ class CrawlerThread(threading.Thread):
     
     def dismiss(self):
         self._dismissed.set()
-
 
 if __name__=="__main__":
     task ={'a':1}
