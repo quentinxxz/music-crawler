@@ -20,7 +20,7 @@ class PlayListParser(object):
 
     @classmethod
     def parser(cls,jsonText):
-    	jsonData=json.loads(jsonText)
+    	jsonData=json.loads(jsonText, encoding="utf-8")
     	return jsonData
 
     
