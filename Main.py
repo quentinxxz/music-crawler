@@ -19,7 +19,7 @@ from PlayListParser import *
 #replace the placeHolder with your own cookie
 cookie = 'palaceHolder'
 ## playlist url  example, change id param if you want to crawl other playlists
-url= "http://music.163.com/api/playlist/detail?id=123905597"
+url= "http://music.163.com/api/playlist/detail?id=123800421"
 
 #download the play list as json text
 playListDownloader = PlayListDownloader(timeout=5,cookie=cookie)

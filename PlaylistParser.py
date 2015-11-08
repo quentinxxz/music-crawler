@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 #coding=utf-8
 import json
+import sys
 import os
 from MP3Crawler import *
 from Constants import *
@@ -10,6 +11,9 @@ class PlayListParser(object):
 
     @classmethod
     def init(cls):
+        #change the default coding
+        reload(sys)
+        sys.setdefaultencoding('utf-8')
     	if not os.path.isdir(playListInfoDir):
     		os.mkdir(playListInfoDir)
     	if not os.path.isdir(musicInfoDir):
@@ -20,7 +24,7 @@ class PlayListParser(object):
 
     @classmethod
     def parser(cls,jsonText):
-    	jsonData=json.loads(jsonText, encoding="utf-8")
+    	jsonData=json.loads(jsonText,encoding='utf-8')
     	return jsonData
 
     
@@ -34,7 +38,7 @@ class PlayListParser(object):
     	id = playListInfo['id']  ##TODO  raise some  exception 
     	if id :
     		playListInfoFie = open(playListInfoDir+str(id)+'.txt', 'w') 
-    		playListInfoFie.write(str(playListInfo))
+    		playListInfoFie.write(json.dumps(playListInfo,encoding="UTF-8",ensure_ascii=False))
     		playListInfoFie.close( )
     		return True
     	else:
@@ -59,8 +63,9 @@ class PlayListParser(object):
     	'''
     	id = track['id']  ##TODO  raise some  exception 
     	if  id :
-    		musicInfoFie = open(musicInfoDir+str(id)+'.txt', 'w') 
-    		musicInfoFie.write(str(track))
+    		musicInfoFie = open(musicInfoDir+str(id)+'.txt', 'w')
+            #text= 
+    		musicInfoFie.write(json.dumps(track,encoding="UTF-8",ensure_ascii=False))
     		musicInfoFie.close( )
     	else:
     		print 'save music info fail'
@@ -89,5 +94,3 @@ if __name__ == '__main__':
 		PlayListParser.downloadMusics(jsonData,crawler)
 
 	crawler.waitUtilComplete()
-
-
