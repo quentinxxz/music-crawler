@@ -24,7 +24,7 @@ class PlayListDownloader(object):
 			'Host' : 'music.163.com',
 			'Connection': 'keep-alive',
 			'Origin':'http://music.163.com',
-			'RA-Sid':'7D78DE40-20150702-170828-f2248c-87c071',
+			'RA-Sid':'7D78DE40-20150702-170828-f2248c-87c071',##TODO ??  what's that
 			'RA-Ver':'3.0.7',
 		 	'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101 Safari/537.36',
 		 	'Content-Type': 'application/x-www-form-urlencoded',
