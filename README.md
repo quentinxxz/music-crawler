@@ -5,12 +5,11 @@
 ```
 '''
 this file show you how to crawl a playlist 
-and save the mp3 files and music info file into disk 
+and save the mp3 files , music info files into disk 
 you should provide follow infos : 
 	1、palylist url
 	2、your cookie in login state
-	3、directory paths to save PlayListInfo josn files、musicInfo josn files and mp3 files
-	  you can change those diretories pathin Constants.py
+	3、directory paths to save PlayListInfo josn files、musicInfo josn files and mp3 files, you can change those diretories paths in Constants.py
 '''
 
 from PlayListDownloader import *
