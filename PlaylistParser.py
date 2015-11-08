@@ -3,10 +3,7 @@
 import json
 import os
 from MP3Crawler import *
-
-playListInfoDir="playListInfo/"
-musicInfoDir="musicInfo/"
-mp3Dir="mp3/"
+from Constants import *
 
 class PlayListParser(object):
     """This class is used to parser json result """
