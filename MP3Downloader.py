@@ -1,17 +1,15 @@
+#!/usr/bin/env python
+#coding=utf-8
 import urllib  
-
 
 
 class MP3Downloader(object):
     """This class is a http mp3 downloader"""
 
+   ##TODO deal with download rety add http timeout
 
     def __init__(self,timeout):
        self.timeout=timeout
-
-
-    def jujstPrint(self):
-    	print self.timeout 	
    
     def __myCallback(blocknum, blocksize, totalsize): 
         ## donothing yet  

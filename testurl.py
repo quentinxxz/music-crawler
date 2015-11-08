@@ -3,7 +3,7 @@ import urllib2
 import sys
 from StringIO import *
 import gzip  
-from GolableValues import *
+
 
 
 

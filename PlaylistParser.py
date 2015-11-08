@@ -76,7 +76,6 @@ class PlaylistParser(object):
 
 
 if __name__ == '__main__':
-	import time
 
 	fileObject = open('result.json')
 	try:
@@ -91,7 +90,7 @@ if __name__ == '__main__':
 	jsonData = PlaylistParser.parser(jsonText)
 	if PlaylistParser.savePlayListInfo(jsonData):
 		PlaylistParser.downloadMusics(jsonData,crawler)
-		
-	crawler.threadPool.wait()
+
+	crawler.waitUtilComplete()
 
 
