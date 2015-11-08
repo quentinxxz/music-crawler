@@ -8,7 +8,7 @@ playListInfoDir="playListInfo/"
 musicInfoDir="musicInfo/"
 mp3Dir="mp3/"
 
-class PlaylistParser(object):
+class PlayListParser(object):
     """This class is used to parser json result """
 
     @classmethod
@@ -50,7 +50,7 @@ class PlaylistParser(object):
     	''''download mp3 music and save music info '''
     	tracks = jsonData['result']['tracks']
     	for track in tracks: 
-    		PlaylistParser.__saveMusic(track,mp3Crawler)
+    		PlayListParser.__saveMusic(track,mp3Crawler)
     		
 
 
@@ -86,10 +86,10 @@ if __name__ == '__main__':
 	crawler = MP3Crawler("MP3Crawler",10)
 	crawler.start()
     	
-	PlaylistParser.init()
-	jsonData = PlaylistParser.parser(jsonText)
-	if PlaylistParser.savePlayListInfo(jsonData):
-		PlaylistParser.downloadMusics(jsonData,crawler)
+	PlayListParser.init()
+	jsonData = PlayListParser.parser(jsonText)
+	if PlayListParser.savePlayListInfo(jsonData):
+		PlayListParser.downloadMusics(jsonData,crawler)
 
 	crawler.waitUtilComplete()
 
