@@ -18,7 +18,7 @@ class MP3Crawler:
     def __init__(self,crawlername,workerThreadNum,
         pollInterval=0.5,pollTimeout=None,downloadTimeout=5):
         self.threadPool = ThreadPool(workerThreadNum)
-        self.crawlername=crawlername
+        self.crawlername = crawlername
         self.pollTimeout = pollTimeout 
         self.crawlerThread = CrawlerThread(self.threadPool,pollTimeout)
         self.mp3Downloader = MP3Downloader(downloadTimeout)
@@ -33,6 +33,10 @@ class MP3Crawler:
         self.crawlerThread.dismiss()
         self.crawlerThread.join()
 
+    def waitUtilComplete(self):
+        '''wait until all tasks complete'''
+        self.threadPool.wait()
+
     def __checkTask(self,task):
         if task.has_key('type')==False or task.has_key('url') ==False:
            return False
@@ -46,8 +50,8 @@ class MP3Crawler:
     def downloadMP3(self,url,filePath):
         self.mp3Downloader.downloadM(url, filePath)
 
+
     def __printResult(self,request,result):
-        print "calllllllllllllllllllllllllllll"
         print "---Result from request %s : %r" % (request.requestID,result)
         #pass
 
